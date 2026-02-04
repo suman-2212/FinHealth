@@ -1,0 +1,63 @@
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
+import uvicorn
+from database import get_db, engine
+from models import Base
+from routers import auth, company, data, metrics, risk, narrative, dashboard_summary, risk_latest, forecast_latest, credit_latest, cashflow_latest, financial_health, risk_analysis, credit_evaluation, forecasting, benchmarking, reports, settings, user
+from middleware.tenant import TenantMiddleware
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="Financial Health Intelligence Platform",
+    description="AI-powered financial health assessment for SMEs",
+    version="1.0.0"
+)
+
+app.add_middleware(TenantMiddleware)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # React frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Security
+security = HTTPBearer()
+
+# Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
+app.include_router(company.router, prefix="/api/company", tags=["company"])
+app.include_router(data.router, prefix="/api/data", tags=["data"])
+app.include_router(metrics.router, prefix="/api/metrics", tags=["metrics"])
+app.include_router(risk.router, prefix="/api/risk", tags=["risk"])
+app.include_router(dashboard_summary.router, prefix="/api", tags=["dashboard-summary"])
+app.include_router(risk_latest.router, prefix="/api/risk", tags=["risk"])
+app.include_router(forecast_latest.router, prefix="/api/forecast", tags=["forecast"])
+app.include_router(credit_latest.router, prefix="/api/credit", tags=["credit"])
+app.include_router(cashflow_latest.router, prefix="/api/cashflow", tags=["cashflow"])
+app.include_router(financial_health.router, prefix="/api", tags=["financial-health"])
+app.include_router(risk_analysis.router, prefix="/api", tags=["risk-analysis"])
+app.include_router(credit_evaluation.router, prefix="/api", tags=["credit-evaluation"])
+app.include_router(forecasting.router, prefix="/api", tags=["forecasting"])
+app.include_router(benchmarking.router, prefix="/api", tags=["benchmarking"])
+app.include_router(reports.router, prefix="/api", tags=["reports"])
+app.include_router(settings.router, prefix="/api", tags=["settings"])
+app.include_router(user.router, prefix="/api/user", tags=["user"])
+
+@app.get("/")
+async def root():
+    return {"message": "Financial Health Intelligence Platform API"}
+
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "service": "financial-health-api"}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
