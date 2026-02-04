@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Local Storage</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .result { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Clear Browser Storage</h1>
+    <p>This will clear all localStorage data and redirect you to login.</p>
+    
+    <button onclick="clearAndRedirect()">Clear Storage & Go to Login</button>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        function clearAndRedirect() {
+            // Clear all localStorage
+            localStorage.clear();
+            
+            // Clear sessionStorage as well
+            sessionStorage.clear();
+            
+            // Show confirmation
+            document.getElementById('result').innerHTML = 
+                'Storage cleared! Redirecting to login in 2 seconds...';
+            
+            // Redirect to login
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
+        }
+        
+        // Show current storage items
+        window.onload = function() {
+            const storageItems = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                storageItems.push(`${key}: ${value.substring(0, 50)}...`);
+            }
+            
+            if (storageItems.length > 0) {
+                document.getElementById('result').innerHTML = 
+                    '<h3>Current localStorage items:</h3><pre>' + 
+                    storageItems.join('\n') + '</pre>';
+            } else {
+                document.getElementById('result').innerHTML = 
+                    '<p>No localStorage items found.</p>';
+            }
+        };
+    </script>
+</body>
+</html>
