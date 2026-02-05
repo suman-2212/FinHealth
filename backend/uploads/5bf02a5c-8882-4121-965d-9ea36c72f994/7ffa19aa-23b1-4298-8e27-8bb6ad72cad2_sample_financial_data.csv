@@ -1,0 +1,13 @@
+date,category,type,amount,description
+01-01-2024,Revenue,Operating,150000,Product Sales
+05-01-2024,Expense,Operating,40000,Raw Materials
+10-01-2024,Expense,Operating,15000,Salaries
+15-01-2024,Revenue,Operating,80000,Service Income
+18-01-2024,Expense,Operating,10000,Rent
+20-01-2024,Expense,Operating,5000,Utilities
+25-01-2024,Loan,Liability,200000,Business Loan
+28-01-2024,Tax,Compliance,12000,GST Payment
+01-02-2024,Revenue,Operating,170000,Product Sales
+05-02-2024,Expense,Operating,45000,Inventory Purchase
+10-02-2024,Expense,Operating,16000,Salaries
+15-02-2024,Revenue,Operating,90000,Service Income
