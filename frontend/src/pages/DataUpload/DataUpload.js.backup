@@ -1,0 +1,199 @@
+import React from 'react';
+import { useCompany } from '../../contexts/CompanyContext';
+import EnhancedDataUpload from '../../components/Upload/EnhancedDataUpload';
+
+const DataUpload = () => {
+  const { selectedCompany } = useCompany();
+
+  if (!selectedCompany) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-500 text-lg">Please select a company to upload data</div>
+      </div>
+    );
+  }
+
+  return <EnhancedDataUpload />;
+};
+
+export default DataUpload;
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleUpload = useCallback(async () => {
+    if (!file || !selectedCompany) return;
+    const token = localStorage.getItem('token');
+    console.log('[UPLOAD DEBUG] Token exists:', !!token);
+    console.log('[UPLOAD DEBUG] Token value:', token?.slice(0, 20) + '...');
+    if (!token) {
+      toast.error('Please log in again');
+      return;
+    }
+
+    setUploading(true);
+    setStatus('processing');
+    setMessage('Processing file...');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('period', new Date().toISOString().slice(0, 7)); // YYYY-MM
+    formData.append('data_type', 'income_statement');
+
+    try {
+      console.log('[UPLOAD] Token:', localStorage.getItem('token'));
+      console.log('[UPLOAD] Headers:', axios.defaults.headers.common);
+      const response = await axios.post('/api/data/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setStatus('success');
+      setMessage(response.data.message || 'File processed successfully!');
+      // Trigger parallel refresh of all dashboard endpoints
+      const refreshEndpoints = [
+        '/api/dashboard-summary',
+        '/api/metrics/dashboard',
+        '/api/risk/latest',
+        '/api/forecast/latest',
+        '/api/credit/latest',
+        '/api/cashflow/latest'
+      ];
+      // Fire all in parallel
+      await Promise.allSettled(
+        refreshEndpoints.map(ep => axios.get(ep).catch(() => null))
+      );
+      // Explicitly refetch risk to ensure debt metrics are up-to-date
+      try {
+        const riskResponse = await axios.get('/api/risk/latest');
+        console.log('[UPLOAD] Risk data after upload:', riskResponse.data);
+      } catch (e) {
+        console.warn('[UPLOAD] Failed to fetch risk data:', e);
+      }
+      // Trigger dashboard refresh events
+      window.dispatchEvent(new CustomEvent('dataUploaded', { detail: response.data }));
+      window.dispatchEvent(new CustomEvent('refreshDashboard', { detail: response.data }));
+    } catch (err) {
+      setStatus('error');
+      setMessage(err.response?.data?.detail || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }, [file, selectedCompany]);
+
+  const reset = () => {
+    setFile(null);
+    setStatus(null);
+    setMessage('');
+  };
+
+  if (!selectedCompany) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-500 text-lg">Please select a company to upload financial data.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Upload Financial Data</h1>
+        <p className="text-gray-600 mt-1">
+          Upload CSV, XLSX, or text-based PDF files for <strong>{selectedCompany.name}</strong>
+        </p>
+      </div>
+
+      {/* Drag and Drop Area */}
+      <div
+        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+          dragActive ? 'border-primary-500 bg-primary-50' : 'border-gray-300'
+        }`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <input
+          type="file"
+          accept=".csv,.xlsx,.xls,.pdf"
+          onChange={handleChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          disabled={uploading}
+        />
+        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+        <p className="mt-2 text-sm text-gray-600">
+          Drag and drop your file here, or click to browse
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          CSV, XLSX, or text-based PDF (max {MAX_SIZE_MB}MB)
+        </p>
+      </div>
+
+      {/* Selected File */}
+      {file && (
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center space-x-3">
+            <FileText className="w-5 h-5 text-gray-500" />
+            <span className="text-sm font-medium text-gray-900">{file.name}</span>
+            <span className="text-xs text-gray-500">
+              ({(file.size / 1024 / 1024).toFixed(2)} MB)
+            </span>
+          </div>
+          <button onClick={reset} disabled={uploading}>
+            <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+          </button>
+        </div>
+      )}
+
+      {/* Status Message */}
+      {status && (
+        <div className={`p-4 rounded-lg flex items-start space-x-3 ${
+          status === 'success' ? 'bg-green-50 text-green-800' :
+          status === 'error' ? 'bg-red-50 text-red-800' :
+          'bg-blue-50 text-blue-800'
+        }`}>
+          {status === 'success' ? <CheckCircle className="w-5 h-5 mt-0.5" /> :
+           status === 'error' ? <AlertCircle className="w-5 h-5 mt-0.5" /> :
+           <div className="w-5 h-5 mt-0.5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />}
+          <div className="text-sm">{message}</div>
+        </div>
+      )}
+
+      {/* Actions */}
+      {file && (
+        <div className="flex space-x-3">
+          <button
+            onClick={handleUpload}
+            disabled={uploading}
+            className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+          >
+            {uploading ? 'Processing...' : 'Upload'}
+          </button>
+          <button
+            onClick={reset}
+            disabled={uploading}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
+      {/* Instructions */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="font-semibold text-blue-900 mb-2">File Requirements</h3>
+        <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+          <li>Include columns: revenue, expenses, assets, liabilities, receivables, payables, loans, inventory, tax</li>
+          <li>Use consistent currency and date formats</li>
+          <li>Only text-based PDFs are supported (no scanned images)</li>
+          <li>Maximum file size: {MAX_SIZE_MB}MB</li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default DataUpload;
