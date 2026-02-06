@@ -18,9 +18,14 @@ app = FastAPI(
 )
 
 # CORS middleware - MUST be added before other middleware
+# Get allowed origins from environment variable for production
+import os
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # React frontend
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicitly include DELETE
     allow_headers=["*", "Authorization", "X-Company-ID"],  # Explicitly include auth headers
@@ -60,4 +65,6 @@ async def health_check():
     return {"status": "healthy", "service": "financial-health-api"}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    # Read port from environment variable for production (Render uses $PORT)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

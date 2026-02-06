@@ -1,7 +1,9 @@
 import axios from "axios";
 
 // Set base URL for backend API
-axios.defaults.baseURL = "http://localhost:8000";
+// In production, this will use REACT_APP_API_URL from environment variables
+// In development, it falls back to localhost
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 // Clear any existing headers
 delete axios.defaults.headers.common['Authorization'];
