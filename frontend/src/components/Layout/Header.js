@@ -4,6 +4,7 @@ import { Menu, Bell, Globe, User, ChevronDown, LogOut, Settings, Plus } from 'lu
 import { useAuth } from '../../contexts/AuthContext';
 import { useCompany } from '../../contexts/CompanyContext';
 import { useFinancialData } from '../../contexts/FinancialDataContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import CreateCompanyModal from '../Company/CreateCompanyModal';
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {

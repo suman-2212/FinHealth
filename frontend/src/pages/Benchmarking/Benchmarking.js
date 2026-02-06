@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import axios from 'axios';
-import { TrendingUp, BarChart3, PieChart, FileText, Download, Filter, Calendar } from 'lucide-react';
+import { TrendingUp, BarChart3, PieChart, FileText, Download, Filter, Calendar, ArrowUp, ArrowDown, Minus, AlertTriangle } from 'lucide-react';
 
 const Benchmarking = () => {
   const { selectedCompany } = useCompany();
