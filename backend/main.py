@@ -22,9 +22,27 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# CORS Configuration
+# Allow specific origins for security
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    "http://localhost:5173",  # Vite dev server (if used)
+    "https://finhealth-7tze.onrender.com",  # Backend itself
+]
+
+# Add Vercel domains from environment variable
+vercel_url = os.getenv("VERCEL_URL")
+if vercel_url:
+    allowed_origins.append(f"https://{vercel_url}")
+
+# Add custom allowed origins from environment
+custom_origins = os.getenv("ALLOWED_ORIGINS", "")
+if custom_origins:
+    allowed_origins.extend([origin.strip() for origin in custom_origins.split(",")])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
