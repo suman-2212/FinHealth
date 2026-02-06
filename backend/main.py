@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
@@ -18,10 +19,8 @@ app = FastAPI(
 )
 
 # CORS middleware - MUST be added before other middleware
-# Get allowed origins from environment variable for production
-import os
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
-allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+# Get allowed origins from environment variable or use defaults
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001").split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -65,6 +64,5 @@ async def health_check():
     return {"status": "healthy", "service": "financial-health-api"}
 
 if __name__ == "__main__":
-    # Read port from environment variable for production (Render uses $PORT)
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

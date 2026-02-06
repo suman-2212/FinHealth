@@ -1,9 +1,8 @@
 import axios from "axios";
 
-// Set base URL for backend API
-// In production, this will use REACT_APP_API_URL from environment variables
-// In development, it falls back to localhost
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+// Set base URL for backend API from environment variable or fallback to localhost
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+axios.defaults.baseURL = API_BASE_URL;
 
 // Clear any existing headers
 delete axios.defaults.headers.common['Authorization'];
@@ -14,7 +13,7 @@ axios.interceptors.request.use((config) => {
   if (config.url?.includes('/api/auth/login') || config.url?.includes('/api/auth/register')) {
     return config;
   }
-  
+
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
 
