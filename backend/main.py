@@ -9,8 +9,12 @@ from models import Base
 from routers import auth, company, data, metrics, risk, narrative, dashboard_summary, risk_latest, forecast_latest, credit_latest, cashflow_latest, financial_health, risk_analysis, credit_evaluation, forecasting, benchmarking, reports, settings, user
 from middleware.tenant import TenantMiddleware
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Create database tables only after database is available
+try:
+    Base.metadata.create_all(bind=engine, checkfirst=True)
+except Exception as e:
+    print(f"Warning: Could not create database tables: {e}")
+    print("Tables will be created on first request")
 
 app = FastAPI(
     title="Financial Health Intelligence Platform",
