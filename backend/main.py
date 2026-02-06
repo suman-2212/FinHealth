@@ -28,6 +28,7 @@ allowed_origins = [
     "http://localhost:3000",  # Local development
     "http://localhost:5173",  # Vite dev server (if used)
     "https://finhealth-7tze.onrender.com",  # Backend itself
+    "https://*.vercel.app",  # All Vercel deployments
 ]
 
 # Add Vercel domains from environment variable
