@@ -16,6 +16,7 @@ except Exception as e:
     print(f"Warning: Could not create database tables: {e}")
     print("Tables will be created on first request")
 
+# Force Render redeploy - CORS fix applied
 app = FastAPI(
     title="Financial Health Intelligence Platform",
     description="AI-powered financial health assessment for SMEs",
