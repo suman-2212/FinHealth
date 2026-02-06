@@ -54,12 +54,37 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Clear any existing tokens first to ensure fresh start
-        localStorage.removeItem('token');
-        localStorage.removeItem('currentCompanyId');
-        delete axios.defaults.headers.common['Authorization'];
-        
-        console.log('Auth check: Starting fresh (cleared existing tokens)');
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          console.log('Auth check: No token found - user not logged in');
+          setLoading(false);
+          return;
+        }
+
+        console.log('Auth check: Token found, validating with backend...');
+
+        // Validate token with backend
+        try {
+          const response = await axios.get('/api/user/profile');
+          console.log('Auth check: Token valid, user authenticated');
+
+          setUser({
+            id: response.data.id,
+            email: response.data.email,
+            full_name: response.data.full_name,
+            companies: response.data.companies || [],
+            default_company_id: response.data.default_company_id
+          });
+        } catch (error) {
+          console.error('Auth check: Token invalid or expired', error.response?.status);
+          // Token is invalid, clear it
+          localStorage.removeItem('token');
+          localStorage.removeItem('currentCompanyId');
+          delete axios.defaults.headers.common['Authorization'];
+          setUser(null);
+        }
+
         setLoading(false);
       } catch (error) {
         console.error('Auth setup error:', error);
@@ -75,56 +100,56 @@ export const AuthProvider = ({ children }) => {
       console.log('AuthContext: Sending login request:', { email: userData.email, password: '***' });
       const response = await axios.post('/api/auth/login', userData);
       console.log('AuthContext: Login response:', response.status, response.data);
-      
+
       // Check if response data has expected structure
       if (!response.data || typeof response.data !== 'object') {
         throw new Error('Invalid response format from server');
       }
-      
+
       const { access_token, user, companies, default_company_id } = response.data;
-      
+
       // Validate required fields
       if (!access_token || !user) {
         console.error('Missing required fields in response:', { access_token: !!access_token, user: !!user });
         throw new Error('Invalid response: missing required authentication data');
       }
-      
+
       // Store token
       localStorage.setItem('token', access_token);
-      
+
       // Set axios default header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+
       if (default_company_id) {
         localStorage.setItem('currentCompanyId', default_company_id);
       }
-      
+
       // Set user state with correct data
-      setUser({ 
+      setUser({
         id: user.id,
         email: user.email,
         full_name: user.full_name,
         companies: companies,
         default_company_id: default_company_id
       });
-      
+
       toast.success('Login successful!');
       return { success: true, companies, default_company_id };
     } catch (error) {
       console.error('AuthContext: Login error details:', error.response?.status, error.response?.data);
       const message = error.response?.data?.detail || 'Login failed';
-      
+
       // Check if it's a token validation error (401) or authentication error (403)
       if (error.response?.status === 401) {
         toast.error('Invalid or expired token. Please log in again.');
         return { success: false, error: 'Invalid or expired token. Please log in again.' };
       }
-      
+
       if (error.response?.status === 403) {
         toast.error('Access denied. Please check your credentials.');
         return { success: false, error: 'Access denied. Please check your credentials.' };
       }
-      
+
       toast.error(message);
       return { success: false, error: message };
     }
