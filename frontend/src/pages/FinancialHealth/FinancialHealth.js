@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import axios from 'axios';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, Activity, Target, Zap, Shield } from 'lucide-react';
+import { TrendingUp, AlertCircle, CheckCircle, Activity, Target, Zap, Shield } from 'lucide-react';
 
 const FinancialHealth = () => {
   const { selectedCompany } = useCompany();

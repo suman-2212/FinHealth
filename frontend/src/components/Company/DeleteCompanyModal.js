@@ -3,7 +3,6 @@ import { Trash2, AlertTriangle, X } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCompany } from '../../contexts/CompanyContext';
-import { useAuth } from '../../contexts/AuthContext';
 
 const DeleteCompanyModal = ({ isOpen, onClose, company }) => {
   const [isDeleting, setIsDeleting] = useState(false);
