@@ -1,109 +1,198 @@
-# Production Deployment Guide
+# FinHealth SaaS Deployment Guide
+
+## Overview
+Deploy your FinHealth financial intelligence SaaS with frontend on Vercel and backend on Render.
+
+## Prerequisites
+- GitHub account with repository access
+- Vercel account
+- Render account
+- Domain name (optional)
 
 ## Backend Deployment (Render)
 
-### Step 1: Deploy to Render
-1. Go to [render.com](https://render.com) and sign up/login
-2. Click "New" → "Web Service"
+### 1. Push Backend to GitHub
+```bash
+cd backend
+git add .
+git commit -m "Add production deployment configuration"
+git push origin main
+```
+
+### 2. Create Render Web Service
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New +" → "Web Service"
 3. Connect your GitHub repository
-4. Select the `FinHealth` repository
-5. Configure the service:
+4. Configure service:
    - **Name**: `finhealth-api`
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
    - **Root Directory**: `backend`
+   - **Instance Type**: `Free`
 
-### Step 2: Set up PostgreSQL Database
-1. In Render dashboard, click "New" → "PostgreSQL"
-2. Configure:
-   - **Name**: `finhealth-db`
-   - **Database Name**: `finhealth_platform`
-   - **User**: `finhealth_user`
-   - **Plan**: Free (to start)
-
-### Step 3: Configure Environment Variables
-In your web service settings, add these environment variables:
-
-```bash
-# Database
-DATABASE_URL=postgresql://finhealth_user:password@host:5432/finhealth_platform
-
-# Security
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-ENCRYPTION_KEY=your-32-character-encryption-key-here
-
-# CORS (replace with your Vercel URL)
-ALLOWED_ORIGINS=https://your-app.vercel.app
-
-# Application
-DEBUG=false
-ENVIRONMENT=production
+### 3. Add Environment Variables
+In Render dashboard → Service → Environment:
+```
+PYTHON_VERSION=3.11.0
 PORT=10000
-
-# Optional APIs
-OPENAI_API_KEY=your-openai-api-key
-REDIS_URL=redis://host:port
+DATABASE_URL=[will be auto-filled from database]
+JWT_SECRET=[auto-generated]
+ENCRYPTION_KEY=[auto-generated]
+ALLOWED_ORIGINS=https://your-vercel-domain.vercel.app
+ENVIRONMENT=production
 ```
 
-### Step 4: Deploy
-1. Click "Create Web Service"
-2. Wait for deployment to complete
-3. Copy the deployed URL (e.g., `https://finhealth-api.onrender.com`)
+### 4. Create PostgreSQL Database
+1. Click "New +" → "PostgreSQL"
+2. Configure:
+   - **Name**: `finhealth-db`
+   - **Database Name**: `financial_health_platform`
+   - **User**: `postgres`
+   - **Plan**: `Free`
+
+### 5. Connect Database to API
+In your web service settings, link the database connection string to `DATABASE_URL`.
+
+### 6. Deploy
+Render will automatically deploy. Your backend URL will be: `https://finhealth-api.onrender.com`
 
 ## Frontend Deployment (Vercel)
 
-### Step 1: Deploy to Vercel
-1. Go to [vercel.com](https://vercel.com) and sign up/login
-2. Click "New Project"
-3. Import your GitHub repository
+### 1. Push Frontend to GitHub
+```bash
+cd frontend
+git add .
+git commit -m "Add Vercel deployment configuration"
+git push origin main
+```
+
+### 2. Import to Vercel
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Click "Add New..." → "Project"
+3. Import your frontend repository
 4. Configure:
    - **Framework Preset**: `Create React App`
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build`
    - **Output Directory**: `build`
 
-### Step 2: Set Environment Variables
-In Vercel dashboard → Settings → Environment Variables:
-```bash
-REACT_APP_API_URL=https://your-backend-url.onrender.com
+### 3. Add Environment Variable
+In Vercel dashboard → Project → Settings → Environment Variables:
+```
+REACT_APP_API_URL=https://finhealth-api.onrender.com
 ```
 
-### Step 3: Deploy
-1. Click "Deploy"
-2. Wait for deployment to complete
-3. Test the deployed application
+### 4. Deploy
+Click "Deploy". Your frontend will be available at: `https://your-project.vercel.app`
 
 ## Post-Deployment Configuration
 
-### Update Backend CORS
-After getting your Vercel URL, update the `ALLOWED_ORIGINS` environment variable on Render:
-```bash
-ALLOWED_ORIGINS=https://your-app.vercel.app
+### 1. Update CORS Settings
+In Render dashboard, update `ALLOWED_ORIGINS` to your actual Vercel domain:
+```
+ALLOWED_ORIGINS=https://your-actual-vercel-domain.vercel.app
 ```
 
-### Test End-to-End Functionality
-1. **Authentication**: Test login/register flow
-2. **Company Management**: Create/select companies
-3. **Data Upload**: Test file uploads
-4. **Dashboard**: Verify all modules load correctly
-5. **API Calls**: Check all requests go to production backend
-6. **CORS**: Ensure no CORS errors in browser console
+### 2. Test Production URLs
+```bash
+# Test backend health
+curl https://finhealth-api.onrender.com/api/health
+
+# Test frontend
+# Open https://your-project.vercel.app in browser
+```
+
+### 3. Verify Functionality
+- [ ] User registration/login works
+- [ ] JWT tokens stored properly
+- [ ] Company creation/deletion works
+- [ ] File uploads work (check size limits)
+- [ ] All dashboard modules load:
+  - [ ] Dashboard Summary
+  - [ ] Risk Analysis
+  - [ ] Credit Evaluation
+  - [ ] Forecasting
+  - [ ] Benchmarking
+  - [ ] Reports
+- [ ] API calls use HTTPS only
+- [ ] No CORS errors
+
+## Environment Variables Summary
+
+### Backend (Render)
+- `DATABASE_URL`: PostgreSQL connection string
+- `JWT_SECRET`: JWT signing secret
+- `ENCRYPTION_KEY`: Data encryption key
+- `ALLOWED_ORIGINS`: Your Vercel domain
+- `ENVIRONMENT`: production
+- `OPENAI_API_KEY`: OpenAI API key (if using AI features)
+- `REDIS_URL`: Redis connection (if using caching)
+
+### Frontend (Vercel)
+- `REACT_APP_API_URL`: Your Render backend URL
+
+## Security Checklist
+- [ ] No hardcoded secrets in code
+- [ ] HTTPS enforced everywhere
+- [ ] CORS properly configured
+- [ ] Environment variables set in production
+- [ ] Database connection uses SSL
+- [ ] File upload size limits enforced
+- [ ] JWT tokens have proper expiration
+- [ ] Sensitive data encrypted in database
 
 ## Troubleshooting
 
 ### Common Issues
-1. **CORS Errors**: Update `ALLOWED_ORIGINS` on Render
-2. **Database Connection**: Verify `DATABASE_URL` format
-3. **Build Failures**: Check logs on Render/Vercel
-4. **Environment Variables**: Ensure all required vars are set
+1. **CORS errors**: Update `ALLOWED_ORIGINS` in Render
+2. **Database connection**: Verify `DATABASE_URL` format
+3. **Build failures**: Check `requirements.txt` dependencies
+4. **API timeouts**: Free Render instances have cold starts (30-60 seconds)
+5. **File upload issues**: Check `MAX_FILE_SIZE` and upload directory permissions
 
-### Health Checks
-- Backend Health: `https://your-backend.onrender.com/api/health`
-- Frontend: Visit your Vercel URL
+### Debug Commands
+```bash
+# Check backend health
+curl https://finhealth-api.onrender.com/api/health
 
-## Security Notes
-- Never commit `.env` files
-- Use strong secrets in production
-- Enable HTTPS (automatic on Render/Vercel)
-- Monitor logs for suspicious activity
+# Check CORS headers
+curl -H "Origin: https://your-vercel-domain.vercel.app" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: X-Requested-With" \
+     -X OPTIONS \
+     https://finhealth-api.onrender.com/api/auth/login
+```
+
+### Log Locations
+- **Backend**: Render Dashboard → Service → Logs
+- **Frontend**: Vercel Dashboard → Project → Functions → Logs
+
+## Domain Configuration (Optional)
+1. Add custom domain in Vercel dashboard
+2. Update `ALLOWED_ORIGINS` in Render to include custom domain
+3. Configure SSL certificates (handled automatically by both platforms)
+
+## Monitoring
+- **Render**: Built-in metrics and logs in dashboard
+- **Vercel**: Analytics and performance metrics
+- **Database**: PostgreSQL metrics in Render dashboard
+- **Uptime**: Use external monitoring like UptimeRobot
+
+## Scaling Guide
+- **Backend**: Upgrade to paid Render instance for better performance
+- **Database**: Upgrade PostgreSQL plan for more resources
+- **Frontend**: Vercel Pro plan for advanced features and edge functions
+
+## Backup Strategy
+- **Database**: Render provides automated backups (7-day retention)
+- **Code**: GitHub repository with version control
+- **Environment**: Store secrets securely in platform dashboards
+- **User Data**: Regular database exports for critical data
+
+## Production Optimization
+- Enable Redis caching for frequently accessed data
+- Implement CDN for static assets
+- Use database connection pooling
+- Monitor and optimize slow queries
+- Set up alerting for errors and performance issues

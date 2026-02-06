@@ -20,15 +20,13 @@ services:
       - key: ENCRYPTION_KEY
         generateValue: true
       - key: ALLOWED_ORIGINS
-        value: https://your-vercel-app.vercel.app
-      - key: DEBUG
-        value: false
+        value: https://your-vercel-domain.vercel.app
       - key: ENVIRONMENT
         value: production
 
   # PostgreSQL Database
   - type: pserv
     name: finhealth-db
-    databaseName: finhealth_platform
+    databaseName: financial_health_platform
+    user: postgres
     plan: free
-    user: finhealth_user
