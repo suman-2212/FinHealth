@@ -30,12 +30,15 @@ export const AuthProvider = ({ children }) => {
       (error) => {
         // If we get a 401 error, automatically logout the user
         if (error.response?.status === 401) {
-          console.error('Token expired or invalid - logging out user');
-          localStorage.removeItem('token');
-          localStorage.removeItem('currentCompanyId');
-          delete axios.defaults.headers.common['Authorization'];
-          setUser(null);
-          toast.error('Session expired. Please login again.');
+          // Only log out if not on the login page
+          if (window.location.pathname !== '/login') {
+            console.error('Token expired or invalid - logging out user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentCompanyId');
+            delete axios.defaults.headers.common['Authorization'];
+            setUser(null);
+            toast.error('Session expired. Please login again.');
+          }
         }
         return Promise.reject(error);
       }
@@ -51,23 +54,15 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
+        // Clear any existing tokens first to ensure fresh start
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentCompanyId');
+        delete axios.defaults.headers.common['Authorization'];
         
-        if (token) {
-          // Ensure axios has the token before making the request
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
-          const response = await axios.get('/api/auth/me');
-          setUser(response.data);
-        }
+        console.log('Auth check: Starting fresh (cleared existing tokens)');
+        setLoading(false);
       } catch (error) {
-        console.error('Auth check failed:', error);
-        if (error.response?.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('currentCompanyId');
-          delete axios.defaults.headers.common['Authorization'];
-        }
-      } finally {
+        console.error('Auth setup error:', error);
         setLoading(false);
       }
     };
@@ -77,8 +72,22 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData) => {
     try {
+      console.log('AuthContext: Sending login request:', { email: userData.email, password: '***' });
       const response = await axios.post('/api/auth/login', userData);
+      console.log('AuthContext: Login response:', response.status, response.data);
+      
+      // Check if response data has expected structure
+      if (!response.data || typeof response.data !== 'object') {
+        throw new Error('Invalid response format from server');
+      }
+      
       const { access_token, user, companies, default_company_id } = response.data;
+      
+      // Validate required fields
+      if (!access_token || !user) {
+        console.error('Missing required fields in response:', { access_token: !!access_token, user: !!user });
+        throw new Error('Invalid response: missing required authentication data');
+      }
       
       // Store token
       localStorage.setItem('token', access_token);
@@ -102,6 +111,7 @@ export const AuthProvider = ({ children }) => {
       toast.success('Login successful!');
       return { success: true, companies, default_company_id };
     } catch (error) {
+      console.error('AuthContext: Login error details:', error.response?.status, error.response?.data);
       const message = error.response?.data?.detail || 'Login failed';
       
       // Check if it's a token validation error (401) or authentication error (403)

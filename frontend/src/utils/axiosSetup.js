@@ -1,7 +1,18 @@
 import axios from "axios";
 
-// Request interceptor: always send Authorization and X-Company-ID
+// Set base URL for backend API
+axios.defaults.baseURL = "http://localhost:8000";
+
+// Clear any existing headers
+delete axios.defaults.headers.common['Authorization'];
+
+// Request interceptor: always send Authorization and X-Company-ID (except for login/register)
 axios.interceptors.request.use((config) => {
+  // Don't add auth headers for login or register requests
+  if (config.url?.includes('/api/auth/login') || config.url?.includes('/api/auth/register')) {
+    return config;
+  }
+  
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
 

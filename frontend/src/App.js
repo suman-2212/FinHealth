@@ -15,6 +15,7 @@ import CreditEvaluation from './pages/CreditEvaluation/CreditEvaluation';
 import Forecasting from './pages/Forecasting/Forecasting';
 import Benchmarking from './pages/Benchmarking/Benchmarking';
 import Reports from './pages/Reports/Reports';
+import Notifications from './pages/Notifications/Notifications';
 import Settings from './pages/Settings/Settings';
 import Profile from './pages/Profile/Profile';
 import DataUpload from './pages/DataUpload/DataUpload';
@@ -94,61 +95,11 @@ function AppLayout() {
     );
   }
 
-  // Check if user has companies
-  if (companies.length === 0) {
-    console.log('Showing no companies screen');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-yellow-800 mb-2">No Companies Found</h2>
-            <p className="text-yellow-700 mb-4">
-              You don't have any companies associated with your account. Please create a company first to access the dashboard.
-            </p>
-            <button
-              onClick={() => window.location.href = '/register'}
-              className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
-            >
-              Create Company
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // User can access dashboard even without companies
+  // Company creation can be done from within the dashboard
 
-  // Check if user has selected a company
-  if (!selectedCompany) {
-    console.log('Showing company selection screen');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-blue-800 mb-2">Select a Company</h2>
-            <p className="text-blue-700 mb-4">
-              Please select a company from the sidebar to access the dashboard.
-            </p>
-            <div className="space-y-2">
-              {companies.map(company => (
-                <button
-                  key={company.id}
-                  onClick={() => {
-                    console.log('Selecting company:', company.id);
-                    localStorage.setItem('currentCompanyId', company.id);
-                    window.location.reload();
-                  }}
-                  className="w-full text-left bg-white border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="font-medium text-gray-900">{company.name}</div>
-                  <div className="text-sm text-gray-500">{company.industry}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // User can access dashboard without company selection
+  // Company selection and creation can be handled within the dashboard
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -167,6 +118,7 @@ function AppLayout() {
             <Route path="/forecasting" element={<Forecasting />} />
             <Route path="/benchmarking" element={<Benchmarking />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="/data-upload" element={<DataUpload />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />

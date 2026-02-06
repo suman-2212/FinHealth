@@ -27,11 +27,7 @@ export const CompanyProvider = ({ children }) => {
       console.log('Companies fetched successfully:', response.data);
       setCompanies(response.data);
       
-      // If no companies found, show a helpful message
-      if (response.data.length === 0) {
-        console.log('No companies found for this user');
-        toast.error('No companies found. Please create a company first.');
-      }
+      // No companies is fine - user can create them from dashboard
     } catch (error) {
       console.error('Failed to fetch companies:', error);
       // Only show error toast if it's not a 401 (unauthorized) error

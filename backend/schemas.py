@@ -39,6 +39,7 @@ class CompanyBrief(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str
+    user: UserResponse
     companies: List[CompanyBrief]
     default_company_id: Optional[uuid.UUID] = None
 
