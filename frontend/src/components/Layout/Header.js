@@ -4,7 +4,6 @@ import { Menu, Bell, Globe, User, ChevronDown, LogOut, Settings, Plus } from 'lu
 import { useAuth } from '../../contexts/AuthContext';
 import { useCompany } from '../../contexts/CompanyContext';
 import { useFinancialData } from '../../contexts/FinancialDataContext';
-import { useLanguage } from '../../contexts/LanguageContext';
 import CreateCompanyModal from '../Company/CreateCompanyModal';
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
@@ -14,7 +13,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCompanySelector, setShowCompanySelector] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const { currentLanguage, t } = useLanguage();
+  const { currentLanguage, t } = { currentLanguage: 'en', t: (key) => key };
 
   // Listen for refresh events after upload
   useEffect(() => {
