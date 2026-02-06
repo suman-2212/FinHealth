@@ -17,16 +17,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.add_middleware(TenantMiddleware)
-
-# CORS middleware
+# CORS middleware - MUST be added before other middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://localhost:3001"],  # React frontend
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicitly include DELETE
+    allow_headers=["*", "Authorization", "X-Company-ID"],  # Explicitly include auth headers
 )
+
+app.add_middleware(TenantMiddleware)
 
 # Security
 security = HTTPBearer()

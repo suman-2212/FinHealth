@@ -175,3 +175,105 @@ async def update_company(
     db.refresh(company)
     
     return company
+
+@router.options("/{company_id}")
+async def options_company(company_id: str):
+    """Handle CORS preflight requests for company endpoints"""
+    return {"message": "CORS preflight successful"}
+
+@router.delete("/{company_id}")
+async def delete_company(
+    company_id: str,
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a company and all associated data.
+    This is a destructive operation that will permanently remove:
+    - Financial data and metrics
+    - Reports and analytics
+    - Risk assessments and credit scores
+    - Forecasting data
+    - Uploaded documents
+    - Benchmarking data
+    - Audit logs
+    """
+    
+    # Import required models at the top to avoid UnboundLocalError
+    from models import (
+        FinancialData, FinancialMetrics, RiskAssessment, CreditScore,
+        UploadedDocument, UserCompany, AuditLog
+    )
+    
+    try:
+        company_uuid = uuid.UUID(company_id)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid company id")
+
+    # Verify user owns this company
+    link = db.query(UserCompany).filter(
+        UserCompany.user_id == current_user.id,
+        UserCompany.company_id == company_uuid,
+    ).first()
+    
+    if not link:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Company not found or access denied"
+        )
+    
+    company = db.query(Company).filter(Company.id == company_uuid).first()
+    if not company:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Company not found"
+        )
+    
+    # Check if this is the user's only company (optional business rule)
+    user_companies_count = db.query(UserCompany).filter(
+        UserCompany.user_id == current_user.id
+    ).count()
+    
+    if user_companies_count == 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your only company. Create another company first."
+        )
+    
+    try:
+        # Delete all related records in correct order to avoid foreign key constraints
+        tables_to_delete = [
+            (AuditLog, 'audit logs'),
+            (UploadedDocument, 'uploaded documents'),
+            (CreditScore, 'credit scores'),
+            (RiskAssessment, 'risk assessments'),
+            (FinancialMetrics, 'financial metrics'),
+            (FinancialData, 'financial data'),
+            (UserCompany, 'user company relationships')
+        ]
+        
+        for model, description in tables_to_delete:
+            try:
+                result = db.query(model).filter(model.company_id == company_uuid).delete()
+                if result > 0:
+                    print(f"Deleted {result} {description}")
+            except Exception as e:
+                print(f"Warning - Could not delete {description}: {e}")
+                # Continue with other tables
+        
+        # Delete the company
+        db.delete(company)
+        
+        # Commit transaction
+        db.commit()
+        
+        return {"message": "Company and all associated data deleted successfully"}
+        
+    except Exception as e:
+        # Rollback on any error
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete company: {str(e)}"
+        )

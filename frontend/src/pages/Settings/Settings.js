@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
+import DeleteCompanyModal from '../../components/Company/DeleteCompanyModal';
 import { 
   Building2, Users, Plug, Bell, Globe, Save, Plus, Trash2, Edit, 
   CheckCircle, AlertCircle, Clock, Shield, Settings as SettingsIcon
@@ -15,6 +16,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Company profile state
   const [companyProfile, setCompanyProfile] = useState({
@@ -274,7 +276,16 @@ const Settings = () => {
         {/* Company Profile Tab */}
         {activeTab === 'company' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">Company Profile</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-medium text-gray-900">Company Profile</h3>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <Trash2 className="h-4 w-4 mr-1.5" />
+                Delete Company
+              </button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -784,6 +795,13 @@ const Settings = () => {
           </div>
         )}
       </div>
+      
+      {/* Delete Company Modal */}
+      <DeleteCompanyModal 
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        company={selectedCompany}
+      />
     </div>
   );
 };

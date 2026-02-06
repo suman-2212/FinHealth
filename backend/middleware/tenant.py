@@ -59,6 +59,10 @@ class TenantMiddleware(BaseHTTPMiddleware):
         if path.startswith(EXEMPT_PATH_PREFIXES):
             return await call_next(request)
 
+        # Handle CORS preflight requests
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         client_ip = request.client.host if request.client else "unknown"
         if not rate_limiter.allow(client_ip):
             return JSONResponse(
