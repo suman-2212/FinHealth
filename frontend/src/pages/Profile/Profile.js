@@ -12,15 +12,11 @@ import {
   Save,
   Key,
   Smartphone,
-  LogOut,
-  Clock,
-  Check,
-  X,
-  AlertCircle
+  Clock
 } from 'lucide-react';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -56,6 +52,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchProfileData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfileData = async () => {
@@ -147,7 +144,7 @@ const Profile = () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('/api/user/upload-profile-image', formData, {
+      await axios.post('/api/user/upload-profile-image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -223,11 +220,10 @@ const Profile = () => {
           <button
             onClick={handleSaveProfile}
             disabled={!hasChanges || saving}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              hasChanges && !saving
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${hasChanges && !saving
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
           >
             {saving ? (
               <div className="flex items-center">
@@ -259,11 +255,10 @@ const Profile = () => {
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === id
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === id
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 <Icon className="w-4 h-4 inline mr-2" />
                 {label}
@@ -355,7 +350,7 @@ const Profile = () => {
         {activeTab === 'security' && (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Security Settings</h2>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center">
@@ -383,11 +378,10 @@ const Profile = () => {
                 </div>
                 <button
                   onClick={handle2FAToggle}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    profileData?.two_fa_enabled
-                      ? 'bg-red-600 text-white hover:bg-red-700'
-                      : 'bg-green-600 text-white hover:bg-green-700'
-                  }`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${profileData?.two_fa_enabled
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                    }`}
                 >
                   {profileData?.two_fa_enabled ? 'Disable 2FA' : 'Enable 2FA'}
                 </button>
@@ -399,7 +393,7 @@ const Profile = () => {
         {activeTab === 'notifications' && (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Notification Preferences</h2>
-            
+
             <div className="space-y-6">
               <div>
                 <h3 className="font-medium text-gray-900 mb-4">Email Alerts</h3>
@@ -445,7 +439,7 @@ const Profile = () => {
         {activeTab === 'regional' && (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Language & Regional Settings</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -460,7 +454,7 @@ const Profile = () => {
                   <option value="hi">हिन्दी (Hindi)</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Timezone
@@ -483,7 +477,7 @@ const Profile = () => {
         {activeTab === 'activity' && (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Account Activity</h2>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center">
@@ -491,7 +485,7 @@ const Profile = () => {
                   <div>
                     <h3 className="font-medium text-gray-900">Last Login</h3>
                     <p className="text-sm text-gray-600">
-                      {profileData?.last_login_at 
+                      {profileData?.last_login_at
                         ? new Date(profileData.last_login_at).toLocaleString()
                         : 'No recent login activity'
                       }
@@ -499,14 +493,14 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center">
                   <User className="w-5 h-5 text-gray-600 mr-3" />
                   <div>
                     <h3 className="font-medium text-gray-900">Account Created</h3>
                     <p className="text-sm text-gray-600">
-                      {profileData?.created_at 
+                      {profileData?.created_at
                         ? new Date(profileData.created_at).toLocaleDateString()
                         : 'Unknown'
                       }
@@ -524,7 +518,7 @@ const Profile = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -537,7 +531,7 @@ const Profile = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   New Password
@@ -549,7 +543,7 @@ const Profile = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm New Password
@@ -562,7 +556,7 @@ const Profile = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowPasswordModal(false)}

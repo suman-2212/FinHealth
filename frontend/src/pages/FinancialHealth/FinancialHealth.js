@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import axios from 'axios';
-import { TrendingUp, AlertCircle, CheckCircle, Activity, Target, Zap, Shield } from 'lucide-react';
+import { TrendingUp, AlertCircle, Activity, Target, Zap, Shield } from 'lucide-react';
 
 const FinancialHealth = () => {
   const { selectedCompany } = useCompany();
@@ -126,7 +126,7 @@ const FinancialHealth = () => {
               {healthData.health_category}
             </p>
           </div>
-          
+
           {/* Circular Progress */}
           <div className="relative w-32 h-32">
             <svg className="transform -rotate-90 w-32 h-32">

@@ -13,7 +13,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCompanySelector, setShowCompanySelector] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const { currentLanguage, t } = { currentLanguage: 'en', t: (key) => key };
+  const { currentLanguage } = { currentLanguage: 'en', t: (key) => key };
 
   // Listen for refresh events after upload
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import axios from 'axios';
-import { FileText, Download, Upload, RefreshCw, AlertCircle, CheckCircle, Clock, File, FileDown, Plus } from 'lucide-react';
+import { FileText, Download, Upload, AlertCircle, CheckCircle, Clock, FileDown, Plus } from 'lucide-react';
 
 const Reports = () => {
   const { selectedCompany } = useCompany();
@@ -24,7 +24,7 @@ const Reports = () => {
         axios.get('/api/reports'),
         axios.get('/api/documents')
       ]);
-      
+
       setReports(reportsResponse.data.reports || []);
       setDocuments(documentsResponse.data.documents || []);
       setError(null);
@@ -50,6 +50,7 @@ const Reports = () => {
       window.removeEventListener('refreshDashboard', handleRefresh);
       window.removeEventListener('dataUploaded', handleRefresh);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompany]);
 
   const generateReport = async (reportType = 'Full Report') => {
@@ -58,10 +59,10 @@ const Reports = () => {
       const response = await axios.post('/api/reports/generate', null, {
         params: { report_type: reportType }
       });
-      
+
       // Refresh reports after generation
       fetchData();
-      
+
       // Show success message
       alert(`Report generated successfully! Version ${response.data.version_number}`);
     } catch (err) {
@@ -77,7 +78,7 @@ const Reports = () => {
       const response = await axios.get(`/api/reports/${reportId}/download/${fileType}`, {
         responseType: 'blob'
       });
-      
+
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -98,7 +99,7 @@ const Reports = () => {
       const response = await axios.get(`/api/documents/${documentId}/download`, {
         responseType: 'blob'
       });
-      
+
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');

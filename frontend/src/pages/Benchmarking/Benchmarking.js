@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import axios from 'axios';
-import { TrendingUp, BarChart3, PieChart, FileText, Download, Filter, Calendar, ArrowUp, ArrowDown, Minus, AlertTriangle } from 'lucide-react';
+import { BarChart3, ArrowUp, ArrowDown, Minus, AlertTriangle } from 'lucide-react';
 
 const Benchmarking = () => {
   const { selectedCompany } = useCompany();
@@ -72,7 +72,7 @@ const Benchmarking = () => {
 
   const formatMetricValue = (metricName, value) => {
     if (value === null || value === undefined) return 'N/A';
-    
+
     switch (metricName) {
       case 'net_profit_margin':
       case 'gross_margin':
@@ -184,7 +184,7 @@ const Benchmarking = () => {
                   {result.status}
                 </span>
               </div>
-              
+
               {/* Comparison Values */}
               <div className="grid grid-cols-3 gap-4 mb-2">
                 <div>
@@ -206,7 +206,7 @@ const Benchmarking = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Progress Bar and Deviation */}
               <div className="flex items-center space-x-3">
                 <div className="flex-1">
@@ -219,10 +219,9 @@ const Benchmarking = () => {
                 </div>
                 <div className="flex items-center space-x-1">
                   {getDeviationIcon(result.deviation_percent)}
-                  <span className={`text-xs font-medium ${
-                    result.deviation_percent > 0 ? 'text-green-600' : 
-                    result.deviation_percent < 0 ? 'text-red-600' : 'text-gray-500'
-                  }`}>
+                  <span className={`text-xs font-medium ${result.deviation_percent > 0 ? 'text-green-600' :
+                      result.deviation_percent < 0 ? 'text-red-600' : 'text-gray-500'
+                    }`}>
                     {result.deviation_percent > 0 ? '+' : ''}{result.deviation_percent.toFixed(1)}%
                   </span>
                 </div>

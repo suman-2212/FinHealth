@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCompany } from '../../contexts/CompanyContext';
 import axios from 'axios';
-import { TrendingUp, TrendingDown, Activity, Target, AlertTriangle, CheckCircle, BarChart3, LineChart } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, AlertTriangle, BarChart3 } from 'lucide-react';
 
 const Forecasting = () => {
   const { selectedCompany } = useCompany();
@@ -150,8 +150,8 @@ const Forecasting = () => {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-3xl font-bold text-gray-900">
-              {forecastData.runway_months !== null && forecastData.runway_months < 999 
-                ? `${forecastData.runway_months.toFixed(1)} months` 
+              {forecastData.runway_months !== null && forecastData.runway_months < 999
+                ? `${forecastData.runway_months.toFixed(1)} months`
                 : 'Infinite'}
             </div>
             <p className="text-sm text-gray-600 mt-1">
@@ -172,15 +172,15 @@ const Forecasting = () => {
         <div className="space-y-3">
           {/* Historical + Projected Revenue */}
           <div className="space-y-2">
-            {forecastData.historical_data && forecastData.historical_data.months && 
+            {forecastData.historical_data && forecastData.historical_data.months &&
               forecastData.historical_data.months.slice(-3).map((month, index) => (
-              <div key={month} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span className="text-sm text-gray-600">{month}</span>
-                <span className="text-sm font-medium">
-                  ${forecastData.historical_data.revenues[index + forecastData.historical_data.months.length - 3].toLocaleString()}
-                </span>
-              </div>
-            ))}
+                <div key={month} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm text-gray-600">{month}</span>
+                  <span className="text-sm font-medium">
+                    ${forecastData.historical_data.revenues[index + forecastData.historical_data.months.length - 3].toLocaleString()}
+                  </span>
+                </div>
+              ))}
             {forecastData.projections && forecastData.projections.map((proj, index) => (
               <div key={proj.projection_month} className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200">
                 <span className="text-sm text-blue-700">{proj.projection_month}</span>

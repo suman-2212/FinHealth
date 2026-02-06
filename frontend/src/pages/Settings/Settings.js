@@ -3,16 +3,15 @@ import { useCompany } from '../../contexts/CompanyContext';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import DeleteCompanyModal from '../../components/Company/DeleteCompanyModal';
-import { 
-  Building2, Users, Plug, Bell, Globe, Save, Plus, Trash2, Edit, 
-  CheckCircle, AlertCircle, Clock, Shield, Settings as SettingsIcon
+import {
+  Building2, Users, Plug, Bell, Globe, Save, Plus, Trash2,
+  CheckCircle, AlertCircle
 } from 'lucide-react';
 
 const Settings = () => {
   const { selectedCompany } = useCompany();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('company');
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -72,6 +71,7 @@ const Settings = () => {
       fetchIntegrations();
       fetchUsers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompany]);
 
   const fetchCompanyProfile = async () => {
@@ -116,12 +116,12 @@ const Settings = () => {
     setSaving(true);
     setError('');
     setSuccess('');
-    
+
     try {
       const response = await axios.put('/api/settings/company', companyProfile);
       setCompanyProfile(response.data);
       setSuccess('Company profile updated successfully!');
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -136,12 +136,12 @@ const Settings = () => {
     setSaving(true);
     setError('');
     setSuccess('');
-    
+
     try {
       const response = await axios.put('/api/settings/preferences', preferences);
       setPreferences(response.data);
       setSuccess('Preferences updated successfully!');
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -155,7 +155,7 @@ const Settings = () => {
   const createIntegration = async () => {
     setSaving(true);
     setError('');
-    
+
     try {
       const response = await axios.post('/api/settings/integrations', newIntegration);
       setIntegrations([...integrations, response.data]);
@@ -168,7 +168,7 @@ const Settings = () => {
         is_active: false
       });
       setSuccess('Integration added successfully!');
-      
+
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to add integration');
@@ -181,7 +181,7 @@ const Settings = () => {
   const inviteUser = async () => {
     setSaving(true);
     setError('');
-    
+
     try {
       await axios.post('/api/settings/users/invite', newUser);
       setShowInviteForm(false);
@@ -192,7 +192,7 @@ const Settings = () => {
         last_name: ''
       });
       setSuccess('Invitation sent successfully!');
-      
+
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to send invitation');
@@ -256,11 +256,10 @@ const Settings = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               <div className="flex items-center space-x-2">
                 <tab.icon className="h-4 w-4" />
@@ -286,23 +285,23 @@ const Settings = () => {
                 Delete Company
               </button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
                 <input
                   type="text"
                   value={companyProfile.name}
-                  onChange={(e) => setCompanyProfile({...companyProfile, name: e.target.value})}
+                  onChange={(e) => setCompanyProfile({ ...companyProfile, name: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
                 <select
                   value={companyProfile.industry}
-                  onChange={(e) => setCompanyProfile({...companyProfile, industry: e.target.value})}
+                  onChange={(e) => setCompanyProfile({ ...companyProfile, industry: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="">Select Industry</option>
@@ -313,12 +312,12 @@ const Settings = () => {
                   <option value="general">General</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Financial Year Start</label>
                 <select
                   value={companyProfile.financial_year_start}
-                  onChange={(e) => setCompanyProfile({...companyProfile, financial_year_start: parseInt(e.target.value)})}
+                  onChange={(e) => setCompanyProfile({ ...companyProfile, financial_year_start: parseInt(e.target.value) })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value={1}>January</option>
@@ -335,12 +334,12 @@ const Settings = () => {
                   <option value={12}>December</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
                 <select
                   value={companyProfile.currency}
-                  onChange={(e) => setCompanyProfile({...companyProfile, currency: e.target.value})}
+                  onChange={(e) => setCompanyProfile({ ...companyProfile, currency: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="USD">USD ($)</option>
@@ -352,18 +351,18 @@ const Settings = () => {
                   <option value="AUD">AUD ($)</option>
                 </select>
               </div>
-              
+
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">GST Number</label>
                 <input
                   type="text"
                   value={companyProfile.gst_number}
-                  onChange={(e) => setCompanyProfile({...companyProfile, gst_number: e.target.value})}
+                  onChange={(e) => setCompanyProfile({ ...companyProfile, gst_number: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 />
               </div>
             </div>
-            
+
             <div className="mt-6">
               <button
                 onClick={saveCompanyProfile}
@@ -401,7 +400,7 @@ const Settings = () => {
                     <input
                       type="email"
                       value={newUser.email}
-                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     />
                   </div>
@@ -409,7 +408,7 @@ const Settings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
                     <select
                       value={newUser.role}
-                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     >
                       <option value="admin">Admin</option>
@@ -422,7 +421,7 @@ const Settings = () => {
                     <input
                       type="text"
                       value={newUser.first_name}
-                      onChange={(e) => setNewUser({...newUser, first_name: e.target.value})}
+                      onChange={(e) => setNewUser({ ...newUser, first_name: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     />
                   </div>
@@ -431,7 +430,7 @@ const Settings = () => {
                     <input
                       type="text"
                       value={newUser.last_name}
-                      onChange={(e) => setNewUser({...newUser, last_name: e.target.value})}
+                      onChange={(e) => setNewUser({ ...newUser, last_name: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     />
                   </div>
@@ -517,7 +516,7 @@ const Settings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Integration Type</label>
                     <select
                       value={newIntegration.integration_type}
-                      onChange={(e) => setNewIntegration({...newIntegration, integration_type: e.target.value})}
+                      onChange={(e) => setNewIntegration({ ...newIntegration, integration_type: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     >
                       <option value="">Select Type</option>
@@ -533,7 +532,7 @@ const Settings = () => {
                     <input
                       type="text"
                       value={newIntegration.provider_name}
-                      onChange={(e) => setNewIntegration({...newIntegration, provider_name: e.target.value})}
+                      onChange={(e) => setNewIntegration({ ...newIntegration, provider_name: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     />
                   </div>
@@ -542,7 +541,7 @@ const Settings = () => {
                     <input
                       type="url"
                       value={newIntegration.api_endpoint}
-                      onChange={(e) => setNewIntegration({...newIntegration, api_endpoint: e.target.value})}
+                      onChange={(e) => setNewIntegration({ ...newIntegration, api_endpoint: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     />
                   </div>
@@ -550,7 +549,7 @@ const Settings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Sync Frequency</label>
                     <select
                       value={newIntegration.sync_frequency}
-                      onChange={(e) => setNewIntegration({...newIntegration, sync_frequency: e.target.value})}
+                      onChange={(e) => setNewIntegration({ ...newIntegration, sync_frequency: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     >
                       <option value="daily">Daily</option>
@@ -593,11 +592,10 @@ const Settings = () => {
                         <p className="text-sm text-gray-500">{integration.integration_type}</p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          integration.is_active 
-                            ? 'bg-green-100 text-green-800' 
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${integration.is_active
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
-                        }`}>
+                          }`}>
                           {integration.is_active ? 'Active' : 'Inactive'}
                         </span>
                         <button className="text-red-600 hover:text-red-900">
@@ -620,7 +618,7 @@ const Settings = () => {
         {activeTab === 'notifications' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">Notification Preferences</h3>
-            
+
             <div className="space-y-6">
               <div>
                 <h4 className="text-md font-medium text-gray-900 mb-4">Email Alerts</h4>
@@ -687,12 +685,12 @@ const Settings = () => {
                   </label>
                 </div>
               </div>
-              
+
               <div>
                 <h4 className="text-md font-medium text-gray-900 mb-4">Notification Frequency</h4>
                 <select
                   value={preferences.notification_frequency}
-                  onChange={(e) => setPreferences({...preferences, notification_frequency: e.target.value})}
+                  onChange={(e) => setPreferences({ ...preferences, notification_frequency: e.target.value })}
                   className="mt-1 block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="immediate">Immediate</option>
@@ -700,7 +698,7 @@ const Settings = () => {
                   <option value="weekly">Weekly Summary</option>
                 </select>
               </div>
-              
+
               <div className="mt-6">
                 <button
                   onClick={saveUserPreferences}
@@ -719,13 +717,13 @@ const Settings = () => {
         {activeTab === 'localization' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">Language & Localization</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
                 <select
                   value={preferences.language}
-                  onChange={(e) => setPreferences({...preferences, language: e.target.value})}
+                  onChange={(e) => setPreferences({ ...preferences, language: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="en">English</option>
@@ -739,12 +737,12 @@ const Settings = () => {
                   <option value="ko">한국어</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
                 <select
                   value={preferences.timezone}
-                  onChange={(e) => setPreferences({...preferences, timezone: e.target.value})}
+                  onChange={(e) => setPreferences({ ...preferences, timezone: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="UTC">UTC</option>
@@ -754,12 +752,12 @@ const Settings = () => {
                   <option value="Asia/Kolkata">India</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Date Format</label>
                 <select
                   value={preferences.date_format}
-                  onChange={(e) => setPreferences({...preferences, date_format: e.target.value})}
+                  onChange={(e) => setPreferences({ ...preferences, date_format: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="YYYY-MM-DD">YYYY-MM-DD</option>
@@ -767,12 +765,12 @@ const Settings = () => {
                   <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Currency Display</label>
                 <select
                   value={preferences.currency_display}
-                  onChange={(e) => setPreferences({...preferences, currency_display: e.target.value})}
+                  onChange={(e) => setPreferences({ ...preferences, currency_display: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 >
                   <option value="symbol">Symbol ($)</option>
@@ -781,7 +779,7 @@ const Settings = () => {
                 </select>
               </div>
             </div>
-            
+
             <div className="mt-6">
               <button
                 onClick={saveUserPreferences}
@@ -795,9 +793,9 @@ const Settings = () => {
           </div>
         )}
       </div>
-      
+
       {/* Delete Company Modal */}
-      <DeleteCompanyModal 
+      <DeleteCompanyModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         company={selectedCompany}
