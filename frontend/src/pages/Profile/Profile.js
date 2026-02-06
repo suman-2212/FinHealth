@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const Profile = () => {
-  const { } = useAuth();
+  // const { user, logout } = useAuth(); // Unused for now
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
