@@ -199,13 +199,6 @@ async def delete_company(
     - Benchmarking data
     - Audit logs
     """
-    
-    # Import required models at the top to avoid UnboundLocalError
-    from models import (
-        FinancialData, FinancialMetrics, RiskAssessment, CreditScore,
-        UploadedDocument, UserCompany, AuditLog
-    )
-    
     try:
         company_uuid = uuid.UUID(company_id)
     except Exception as e:
@@ -242,15 +235,38 @@ async def delete_company(
         )
     
     try:
-        # Delete all related records in correct order to avoid foreign key constraints
+        # Import ALL models that have a company_id FK to avoid SQLite FK constraint violations
+        from models import (
+            FinancialData, FinancialMetrics, RiskAssessment, CreditScore,
+            UploadedDocument, AuditLog,
+            Receivable, Payable, TaxRecord, MonthlySummary,
+            RiskSummary, FinancialHealthSummary, CreditScoreSummary,
+            ForecastSummary, BenchmarkSummary, Report,
+            Integration, UserPreference, Forecast,
+        )
+
+        # Delete all related records in correct order (children before parent Company row)
         tables_to_delete = [
-            (AuditLog, 'audit logs'),
-            (UploadedDocument, 'uploaded documents'),
-            (CreditScore, 'credit scores'),
-            (RiskAssessment, 'risk assessments'),
-            (FinancialMetrics, 'financial metrics'),
-            (FinancialData, 'financial data'),
-            (UserCompany, 'user company relationships')
+            (AuditLog,               'audit logs'),
+            (Report,                 'reports'),
+            (UploadedDocument,       'uploaded documents'),
+            (Integration,            'integrations'),
+            (UserPreference,         'user preferences'),
+            (Forecast,               'forecasts'),
+            (ForecastSummary,        'forecast summaries'),
+            (CreditScoreSummary,     'credit score summaries'),
+            (CreditScore,            'credit scores'),
+            (RiskSummary,            'risk summaries'),
+            (RiskAssessment,         'risk assessments'),
+            (FinancialHealthSummary, 'financial health summaries'),
+            (BenchmarkSummary,       'benchmark summaries'),
+            (MonthlySummary,         'monthly summaries'),
+            (TaxRecord,              'tax records'),
+            (Payable,                'payables'),
+            (Receivable,             'receivables'),
+            (FinancialMetrics,       'financial metrics'),
+            (FinancialData,          'financial data'),
+            (UserCompany,            'user company relationships'),
         ]
         
         for model, description in tables_to_delete:
@@ -262,16 +278,13 @@ async def delete_company(
                 print(f"Warning - Could not delete {description}: {e}")
                 # Continue with other tables
         
-        # Delete the company
+        # Delete the company row itself
         db.delete(company)
-        
-        # Commit transaction
         db.commit()
         
         return {"message": "Company and all associated data deleted successfully"}
         
     except Exception as e:
-        # Rollback on any error
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
